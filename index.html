@@ -1,0 +1,1585 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Painel Saúde 2026</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Saúde 2026">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#1d5c68">
+
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f2ec;
+    --surface: #fdfcf8;
+    --ink: #1c2a2e;
+    --muted: #5b686c;
+    --line: #d8d3c6;
+    --accent: #1d5c68;
+    --accent-soft: rgba(29, 92, 104, 0.12);
+    --ok: #2d6e48;
+    --ok-bg: #e3f0e7;
+    --warn: #7d5300;
+    --warn-bg: #f7edd6;
+    --bad: #a3241b;
+    --bad-bg: #f6dedb;
+    --neutral: #4f5c60;
+    --neutral-bg: #e9ebe9;
+    --grey: #7d878b;
+    --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+    --font-body: "Source Sans 3", "Segoe UI", Arial, sans-serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #11191c;
+      --surface: #18242a;
+      --ink: #e6ece9;
+      --muted: #9fadb0;
+      --line: #2c3d43;
+      --accent: #7cc3cf;
+      --accent-soft: rgba(124, 195, 207, 0.14);
+      --ok: #7fcf9b;
+      --ok-bg: #1d3a2a;
+      --warn: #f0b865;
+      --warn-bg: #3d3018;
+      --bad: #ff9a8f;
+      --bad-bg: #3d211e;
+      --neutral: #b4c0c2;
+      --neutral-bg: #262f33;
+      --grey: #6f7d82;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #11191c;
+    --surface: #18242a;
+    --ink: #e6ece9;
+    --muted: #9fadb0;
+    --line: #2c3d43;
+    --accent: #7cc3cf;
+    --accent-soft: rgba(124, 195, 207, 0.14);
+    --ok: #7fcf9b;
+    --ok-bg: #1d3a2a;
+    --warn: #f0b865;
+    --warn-bg: #3d3018;
+    --bad: #ff9a8f;
+    --bad-bg: #3d211e;
+    --neutral: #b4c0c2;
+    --neutral-bg: #262f33;
+    --grey: #6f7d82;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.45;
+    padding-block: 20px 28px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    overflow-wrap: anywhere;
+  }
+  .page { max-width: 980px; margin: 0 auto; min-width: 0; }
+  h1, h2, h3 { font-family: var(--font-display); font-weight: 600; margin: 0; line-height: 1.2; }
+  h1 { font-size: 26px; }
+  h2 { font-size: 19px; margin-bottom: 10px; }
+  h3 { font-size: 15px; font-family: var(--font-body); font-weight: 700; margin-bottom: 4px; }
+  p { margin: 0 0 8px; }
+  .mut { color: var(--muted); }
+  .small { font-size: 13px; }
+  .eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .sub { color: var(--muted); margin-top: 4px; font-size: 14px; }
+
+  header.top {
+    display: flex; flex-direction: column; gap: 8px;
+    padding-bottom: 14px; margin-bottom: 16px; border-bottom: 1px solid var(--line);
+  }
+  .hero {
+    display: grid; grid-template-columns: 1fr; gap: 12px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px;
+  }
+  .hero .dia { font-family: var(--font-display); font-size: 30px; font-weight: 600; line-height: 1.1; }
+  .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .stat { border-top: 2px solid var(--line); padding-top: 8px; min-width: 0; }
+  .stat .k { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; font-weight: 600; }
+  .stat .v { font-family: var(--font-display); font-size: 24px; font-weight: 600; }
+  .stat .n { font-size: 13px; color: var(--muted); }
+
+  .pill {
+    display: inline-block; padding: 4px 12px; border-radius: 999px;
+    font-weight: 700; font-size: 14px; border: 1px solid currentColor; width: fit-content;
+  }
+  .pill.ok { color: var(--ok); background: var(--ok-bg); }
+  .pill.warn { color: var(--warn); background: var(--warn-bg); }
+  .pill.bad { color: var(--bad); background: var(--bad-bg); }
+  .pill.neutral { color: var(--neutral); background: var(--neutral-bg); }
+
+  section.block {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+    padding: 16px; margin-top: 16px; min-width: 0;
+  }
+  .grid { display: grid; gap: 12px; grid-template-columns: 1fr; min-width: 0; }
+  .card {
+    border: 1px solid var(--line); border-radius: 8px; padding: 12px; background: var(--bg); min-width: 0;
+  }
+  .card .big { font-family: var(--font-display); font-size: 22px; font-weight: 600; margin: 2px 0; }
+  .delta { font-weight: 700; }
+  .delta.ok { color: var(--ok); }
+  .delta.bad { color: var(--bad); }
+  .delta.neutral { color: var(--neutral); }
+
+  .chart-wrap { position: relative; min-width: 0; }
+  .chart-wrap svg { width: 100%; height: auto; display: block; touch-action: pan-y; }
+  .grid-line, .grid { stroke: var(--line); stroke-width: .6; }
+  .tick { fill: var(--muted); font-size: 9.5px; font-family: var(--font-body); }
+  .s-band { fill: var(--accent-soft); stroke: none; }
+  .s-base { fill: none; stroke: var(--accent); stroke-width: 2.4; }
+  .s-cons { fill: none; stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 5 3; }
+  .s-otim { fill: none; stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 1.5 2.5; }
+  .s-meta { stroke: var(--ink); stroke-width: 1; stroke-dasharray: 6 4; }
+  .s-real { fill: var(--ink); stroke: var(--surface); stroke-width: .8; }
+  .s-cross { stroke: var(--ink); stroke-width: .8; opacity: .55; }
+  .s-seg { fill: var(--accent-soft); }
+  .s-seg-txt { fill: var(--ink); font-size: 9.5px; text-anchor: middle; font-family: var(--font-body); font-weight: 700; }
+  .s-app { stroke: var(--accent); stroke-width: 1.8; }
+  .s-overlay { fill: transparent; }
+  .s-label { fill: var(--ink); font-size: 10px; font-family: var(--font-body); font-weight: 700; }
+
+  .legend { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; margin: 12px 0; font-size: 14px; }
+  .legend div { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .legend svg { flex: 0 0 auto; }
+  .tip {
+    position: absolute; top: 4px; pointer-events: none; transform: translateX(-50%);
+    background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 6px;
+    padding: 6px 8px; font-size: 13px; line-height: 1.35; width: max-content; max-width: 190px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.12);
+  }
+  .tip[hidden] { display: none; }
+
+  details { margin-top: 12px; }
+  summary { cursor: pointer; font-weight: 600; color: var(--accent); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 8px; table-layout: fixed; }
+  th, td { text-align: left; padding: 7px 4px; border-bottom: 1px solid var(--line); vertical-align: top; overflow-wrap: anywhere; }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 700; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  .verdict { border-left: 4px solid var(--bad); background: var(--bad-bg); padding: 10px 12px; border-radius: 6px; margin-top: 12px; }
+  .verdict.ok { border-left-color: var(--ok); background: var(--ok-bg); }
+  .verdict p { margin: 0; }
+
+  .prior { list-style: none; padding: 0; margin: 8px 0 0; color: var(--grey); font-size: 14px; display: grid; gap: 4px; }
+  .prior li { padding-left: 10px; border-left: 2px solid var(--line); }
+
+  form.reg { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; margin-top: 10px; }
+  form.reg label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--muted); font-weight: 600; min-width: 0; }
+  form.reg .full { grid-column: 1 / -1; }
+  input {
+    font: inherit; font-size: 16px; color: var(--ink); background: var(--bg);
+    border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; width: 100%; min-width: 0;
+  }
+  input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .btns { display: flex; flex-wrap: wrap; gap: 8px; grid-column: 1 / -1; margin-top: 4px; }
+  button {
+    font: inherit; font-weight: 700; font-size: 15px; padding: 9px 14px; border-radius: 6px; cursor: pointer;
+    border: 1px solid var(--accent); background: var(--accent); color: var(--surface);
+  }
+  button.alt { background: transparent; color: var(--accent); }
+  button:disabled { opacity: .45; cursor: default; }
+  .msg { font-size: 14px; margin-top: 8px; min-height: 1.2em; }
+  .note { font-size: 13px; color: var(--muted); margin-top: 8px; }
+
+
+  select {
+    font: inherit; font-size: 16px; color: var(--ink); background: var(--bg);
+    border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; width: 100%; min-width: 0;
+  }
+  select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  form.reg h3 { margin-bottom: 0; }
+  .scroll { overflow-x: auto; }
+  table.auto { table-layout: auto; }
+  table.auto th, table.auto td { overflow-wrap: normal; }
+  .pill.sm { padding: 1px 9px; font-size: 12px; }
+  button.mini { padding: 4px 9px; font-size: 13px; }
+  .banner {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;
+    border: 1px solid var(--warn); background: var(--warn-bg); color: var(--ink);
+    border-radius: 10px; padding: 12px 14px; margin-bottom: 16px;
+  }
+  .banner.bad { border-color: var(--bad); background: var(--bad-bg); }
+  .banner[hidden] { display: none; }
+  .banner div { min-width: 0; flex: 1 1 220px; }
+  .bar { height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; margin-top: 6px; }
+  .bar span { display: block; height: 100%; background: var(--accent); }
+  .s-ok { fill: var(--ok); stroke: var(--surface); stroke-width: .8; }
+
+  .steps { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+  .steps li { border-left: 3px solid var(--accent); padding: 4px 0 4px 12px; }
+  .steps li.alerta { border-left-color: var(--warn); background: var(--warn-bg); border-radius: 6px; padding: 8px 12px; }
+
+  footer { margin-top: 20px; font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; }
+
+  @media (min-width: 720px) {
+    .hero { grid-template-columns: 1.1fr 1fr; align-items: center; }
+    .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid.two { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+
+<style>[hidden]{display:none!important} html{color-scheme:light} :root[data-theme="dark"]{color-scheme:dark}</style>
+
+<style>
+  .print-only { display: none; }
+  @page { size: A4; margin: 13mm 12mm; }
+  @media print {
+    html:root:not(#p) {
+      --bg:#ffffff; --surface:#ffffff; --ink:#1a2327; --muted:#4f5b5f; --line:#cfcabd; --accent:#1d5c68; --accent-soft:rgba(29,92,104,.14);
+      --ok:#2d6e48; --ok-bg:#e3f0e7; --warn:#7d5300; --warn-bg:#f7edd6; --bad:#a3241b; --bad-bg:#f6dedb;
+      --neutral:#4f5c60; --neutral-bg:#e9ebe9; --grey:#6b7579; color-scheme: light;
+    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body { background:#fff; font-size:10.5pt; line-height:1.4; padding:0; }
+    .page { max-width:none; }
+    .print-only { display:block; font-size:9pt; color:var(--muted); letter-spacing:.04em; text-transform:uppercase; margin-bottom:6px; }
+    .no-print, button, form.reg, .banner, input, #h-reg, #h-meta, .tip, summary { display:none !important; }
+    section[aria-labelledby="h-reg"], section[aria-labelledby="h-meta"], section[aria-labelledby="h-bk"] { display:none !important; }
+    details > summary { display:none !important; }
+    details { margin-top: 4px; }
+    header.top { padding-bottom:8px; margin-bottom:10px; }
+    h1 { font-size:21pt; } h2 { font-size:14pt; margin-bottom:6px; } h3 { font-size:10.5pt; }
+    h2, h3 { break-after: avoid; }
+    section.block { border:0.6pt solid var(--line); border-radius:4px; padding:10px 12px; margin-top:10px; box-shadow:none; }
+    .hero { grid-template-columns:1fr; padding:10px 12px; border-radius:4px; }
+    section.block { break-inside: avoid; }
+    section[aria-labelledby="h-chart"] details { display:none !important; }
+    .hero .dia { font-size:22pt; }
+    .stats { grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
+    .stat .v { font-size:16pt; }
+    .grid.three { grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+    .card, .verdict, .chart-wrap, .legend, tr, .stat { break-inside: avoid; }
+    .card { padding:8px; } .card .big { font-size:15pt; }
+    .legend { font-size:9pt; gap:4px 10px; grid-template-columns:repeat(4,auto); justify-content:start; }
+    .chart-wrap svg { max-height: 72mm; width: 100%; margin: 0 auto; }
+    table { font-size:9pt; margin-top:4px; }
+    th, td { padding:4px 5px; }
+    table.auto th:last-child, table.auto td:last-child { display:none; }
+    .scroll { overflow: visible; }
+    .steps li { break-inside: avoid; }
+    footer { margin-top:12px; }
+    a { color: inherit; text-decoration: none; }
+  }
+</style>
+</head>
+<body>
+<script>
+// Armazenamento local (substitui o banco do Claude): grava no navegador deste aparelho.
+(function () {
+  "use strict";
+  var KEY = "saude2026.dados.v1";
+  var mem = {};
+  var persistente = true;
+  function ler() {
+    try { var r = window.localStorage.getItem(KEY); return r ? JSON.parse(r) : {}; }
+    catch (e) { persistente = false; return mem; }
+  }
+  var data = ler();
+  // Dados iniciais (cópia do painel do Claude em 06/11/2026). Entram uma única vez neste aparelho.
+  if (!data["_seed_pwa_vazio"]) {
+    var inicial = {};
+    Object.keys(inicial).forEach(function (k) { if (!data[k]) { data[k] = inicial[k]; } });
+    data["_seed_pwa_vazio"] = true;
+    try { window.localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) { persistente = false; mem = data; }
+  }
+  var subs = [];
+  function gravarTudo() {
+    try { window.localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) { persistente = false; mem = data; }
+  }
+  function avisa() { subs.forEach(function (f) { f(); }); }
+  function snap(path) {
+    var d = Object.prototype.hasOwnProperty.call(data, path) ? data[path] : null;
+    return { id: path.split("/").pop(), exists: d !== null, data: function () { return d ? JSON.parse(JSON.stringify(d)) : undefined; } };
+  }
+  var db = {
+    doc: function (p) {
+      return {
+        set: function (o) { data[p] = JSON.parse(JSON.stringify(o)); gravarTudo(); setTimeout(avisa, 0); return Promise.resolve(); },
+        delete: function () { delete data[p]; gravarTudo(); setTimeout(avisa, 0); return Promise.resolve(); },
+        onSnapshot: function (cb) { var f = function () { cb(snap(p)); }; subs.push(f); setTimeout(f, 0); return function () {}; }
+      };
+    },
+    collection: function (c) {
+      return {
+        onSnapshot: function (cb) {
+          var f = function () {
+            var docs = Object.keys(data).filter(function (k) { return k.indexOf(c + "/") === 0 && k.indexOf("/", c.length + 1) < 0; }).sort().map(snap);
+            cb({ docs: docs });
+          };
+          subs.push(f); setTimeout(f, 0); return function () {};
+        }
+      };
+    }
+  };
+  window.SAUDE_LOCAL = true;
+  window.SAUDE_PERSISTENTE = function () { return persistente; };
+  window.claude = { use: function (n) { return Promise.resolve(n === "db" ? db : null); } };
+  window.addEventListener("storage", function (e) { if (e.key === KEY) { data = ler(); avisa(); } });
+
+  window.SAUDE_EXPORTAR = function () {
+    var out = JSON.stringify({ app: "saude2026", versao: 1, exportado_em: new Date().toISOString(), dados: data }, null, 2);
+    var nome = "saude2026-backup-" + new Date().toISOString().slice(0, 10) + ".json";
+    function baixar() {
+      var blob = new Blob([out], { type: "application/json" });
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob); a.download = nome;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+    }
+    try {
+      var f = new File([out], nome, { type: "application/json" });
+      if (navigator.canShare && navigator.canShare({ files: [f] })) {
+        navigator.share({ files: [f], title: "Backup Saúde 2026" }).catch(function (e) { if (e && e.name !== "AbortError") { baixar(); } });
+        return;
+      }
+    } catch (e) {}
+    baixar();
+  };
+  window.SAUDE_IMPORTAR = function (file, cb) {
+    var r = new FileReader();
+    r.onload = function () {
+      try {
+        var o = JSON.parse(String(r.result));
+        if (!o || o.app !== "saude2026" || typeof o.dados !== "object" || o.dados === null) { cb(false, "Arquivo não é um backup deste painel."); return; }
+        var n = 0;
+        Object.keys(o.dados).forEach(function (k) {
+          if (/^(medicoes|aplicacoes|exercicios|config)\/[A-Za-z0-9_.:@+~-]+$/.test(k) && typeof o.dados[k] === "object") { data[k] = o.dados[k]; n++; }
+        });
+        gravarTudo(); setTimeout(avisa, 0);
+        cb(true, n + " registros importados (os de mesmo identificador foram substituídos).");
+      } catch (e) { cb(false, "Não foi possível ler o arquivo."); }
+    };
+    r.onerror = function () { cb(false, "Não foi possível ler o arquivo."); };
+    r.readAsText(file);
+  };
+})();
+</script>
+<div class="page">
+  <div class="print-only" id="print-head">Relatório de acompanhamento de saúde · gerado em <span id="print-date"></span></div>
+  <header class="top">
+    <span class="eyebrow">Painel de acompanhamento 2026</span>
+    <h1>Meu acompanhamento</h1>
+    <p class="sub" id="hdr-sub"></p>
+    <div class="btns no-print" style="margin-top:6px"><button type="button" id="btn-pdf">Salvar como PDF</button></div>
+    <p class="small mut no-print" id="pdf-help" style="margin:0">Na janela de impressão escolha "Salvar como PDF" e deixe as margens em "Padrão".</p>
+  </header>
+
+  <div class="banner" id="aviso" hidden></div>
+
+  <section class="hero" aria-labelledby="h-hero">
+    <div>
+      <span class="eyebrow" id="h-hero">Situação atual</span>
+      <p class="dia" id="hero-dia">&nbsp;</p>
+      <p class="sub" id="hero-dia-sub"></p>
+      <span class="pill neutral" id="hero-status">Carregando</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">Peso atual</div><div class="v" id="hero-peso">--</div><div class="n" id="hero-peso-sub"></div></div>
+      <div class="stat"><div class="k">IMC</div><div class="v" id="hero-imc">--</div><div class="n" id="hero-imc-n"></div></div>
+      <div class="stat"><div class="k" id="hero-falta-k">Falta para a meta</div><div class="v" id="hero-falta">--</div><div class="n" id="hero-falta-n"></div></div>
+      <div class="stat"><div class="k">Trajetória base</div><div class="v" id="hero-base">--</div><div class="n" id="hero-base-n"></div></div>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="h-cmp">
+    <h2 id="h-cmp">Comparativos</h2>
+    <p class="small mut">Usa a primeira pesagem de cada dia. Medições anteriores ao projeto não entram nestes cartões.</p>
+    <div class="grid three" id="cards"></div>
+  </section>
+
+  <section class="block" aria-labelledby="h-chart">
+    <h2 id="h-chart">Trajetória de peso: 19/10 a 31/12/2026</h2>
+    <div class="legend" aria-label="Legenda">
+      <div><svg width="30" height="8"><line class="s-meta" x1="0" y1="4" x2="30" y2="4"/></svg><span id="leg-meta">Meta</span></div>
+      <div><svg width="30" height="8"><line class="s-base" x1="0" y1="4" x2="30" y2="4"/></svg>Base (×1,0)</div>
+      <div><svg width="30" height="8"><line class="s-cons" x1="0" y1="4" x2="30" y2="4"/></svg>Conservador (×0,6)</div>
+      <div><svg width="30" height="8"><line class="s-otim" x1="0" y1="4" x2="30" y2="4"/></svg>Otimista (×1,4)</div>
+      <div><svg width="30" height="10"><rect x="0" y="1" width="30" height="8" class="s-band"/></svg>Faixa entre cenários</div>
+      <div><svg width="30" height="10"><circle cx="15" cy="5" r="4" class="s-real"/></svg>Pesagens do projeto</div>
+      <div><svg width="30" height="10"><rect x="0" y="0" width="30" height="10" class="s-seg"/><line class="s-app" x1="15" y1="0" x2="15" y2="10"/></svg>Aplicação e dose</div>
+    </div>
+    <div class="chart-wrap" id="chart-wrap">
+      <div id="chart"></div>
+      <div class="tip" id="chart-tip" hidden></div>
+    </div>
+    <details>
+      <summary>Ver tabela da trajetória (a cada 7 dias)</summary>
+      <table>
+        <thead><tr><th>Data</th><th class="num">Conserv.</th><th class="num">Base</th><th class="num">Otim.</th><th class="num">Real</th></tr></thead>
+        <tbody id="tabela-body"></tbody>
+      </table>
+    </details>
+  </section>
+
+  <section class="block" aria-labelledby="h-proj">
+    <h2 id="h-proj">Projeção até 31/12/2026</h2>
+    <p class="small mut" id="proj-start"></p>
+    <table>
+      <thead><tr><th>Cenário</th><th class="num" id="proj-th31">Peso previsto</th><th class="num" id="proj-thmeta">Chega à meta</th></tr></thead>
+      <tbody id="proj-body"></tbody>
+    </table>
+    <div class="verdict" id="proj-verdict"></div>
+    <p class="note" id="proj-note"></p>
+  </section>
+
+  <section class="block" aria-labelledby="h-ap">
+    <h2 id="h-ap">Aplicações de tirzepatida</h2>
+    <p class="small mut">Aplicação semanal às terças-feiras, a partir de 20/10/2026 (1ª aplicação de 2,5 mg confirmada em 20/10). A dose prevista segue o esquema da bula e precisa ser confirmada pelo médico prescritor. Quando a data chegar, um aviso aparece no topo da página.</p>
+    <div class="scroll">
+      <table class="auto">
+        <thead><tr><th>Sem.</th><th>Data</th><th>Dose prevista</th><th>Situação</th><th></th></tr></thead>
+        <tbody id="ap-body"></tbody>
+      </table>
+    </div>
+    <form class="reg" id="form-ap" novalidate>
+      <h3 class="full" id="ap-form-t">Confirmar aplicação</h3>
+      <label>Aplicação da semana
+        <select id="ap-sem"></select>
+      </label>
+      <label>Data em que aplicou
+        <input type="date" id="ap-data">
+      </label>
+      <label>Dose aplicada (mg)
+        <select id="ap-dose">
+          <option value="2.5">2,5 mg</option><option value="5">5 mg</option><option value="7.5">7,5 mg</option>
+          <option value="10">10 mg</option><option value="12.5">12,5 mg</option><option value="15">15 mg</option>
+        </select>
+      </label>
+      <label>Local da aplicação
+        <select id="ap-local">
+          <option value="">não informado</option><option value="abdômen" selected>abdômen</option><option value="coxa">coxa</option><option value="braço">braço</option>
+        </select>
+      </label>
+      <label class="full">Observações
+        <input type="text" id="ap-obs" maxlength="200" placeholder="opcional, ex.: enjoo leve à noite">
+      </label>
+      <div class="btns">
+        <button type="submit">Salvar confirmação</button>
+        <button type="button" class="alt" id="ap-undo">Desfazer confirmação</button>
+      </div>
+      <div class="msg full" id="ap-msg" aria-live="polite"></div>
+    </form>
+  </section>
+
+  <section class="block" aria-labelledby="h-ex">
+    <h2 id="h-ex">Exercícios</h2>
+    <div class="grid three" id="ex-cards"></div>
+    <form class="reg" id="form-ex" novalidate>
+      <h3 class="full">Registrar exercício</h3>
+      <label>Data
+        <input type="date" id="ex-data">
+      </label>
+      <label>Atividade
+        <select id="ex-tipo"><option>Caminhada</option><option>Corrida</option><option>Bicicleta</option><option>Musculação</option><option>Outro</option></select>
+      </label>
+      <label>Distância (km)
+        <input type="text" inputmode="decimal" id="ex-dist" placeholder="ex.: 3,5">
+      </label>
+      <label>Tempo (min ou h:mm)
+        <input type="text" inputmode="decimal" id="ex-tempo" placeholder="ex.: 45 ou 0:45">
+      </label>
+      <label class="full">Calorias gastas (kcal)
+        <input type="text" inputmode="decimal" id="ex-cal" placeholder="ex.: 220">
+      </label>
+      <div class="btns"><button type="submit">Salvar exercício</button></div>
+      <div class="msg full" id="ex-msg" aria-live="polite"></div>
+    </form>
+    <details open>
+      <summary>Últimos registros</summary>
+      <div class="scroll">
+        <table class="auto">
+          <thead><tr><th>Data</th><th>Atividade</th><th class="num">km</th><th class="num">min</th><th class="num">kcal</th><th></th></tr></thead>
+          <tbody id="ex-body"></tbody>
+        </table>
+      </div>
+    </details>
+  </section>
+
+  <section class="block" aria-labelledby="h-comp">
+    <h2 id="h-comp">Composição corporal</h2>
+    <table>
+      <thead><tr><th>Medida</th><th class="num" id="comp-prev-head">Último prévio</th><th class="num">Último do projeto</th></tr></thead>
+      <tbody id="comp-body"></tbody>
+    </table>
+    <p class="small mut" style="margin-top:12px"><strong>Medições antes do projeto (mai-jul/2026)</strong></p>
+    <ul class="prior" id="prior-list"></ul>
+  </section>
+
+  <section class="block" aria-labelledby="h-reg">
+    <h2 id="h-reg">Registrar medição</h2>
+    <form class="reg" id="form-reg" novalidate>
+      <label>Data
+        <input type="date" id="f-data" required>
+      </label>
+      <label>Peso (kg)
+        <input type="text" inputmode="decimal" id="f-peso" placeholder="ex.: 85,4" required>
+      </label>
+      <label>Gordura corporal (%)
+        <input type="text" inputmode="decimal" id="f-gord" placeholder="opcional">
+      </label>
+      <label>Músculo esquelético (kg)
+        <input type="text" inputmode="decimal" id="f-musc" placeholder="opcional">
+      </label>
+      <label>Água (%)
+        <input type="text" inputmode="decimal" id="f-agua" placeholder="opcional">
+      </label>
+      <label>Gordura visceral
+        <input type="text" inputmode="decimal" id="f-visc" placeholder="opcional">
+      </label>
+      <label class="full">Metabolismo basal (kcal)
+        <input type="text" inputmode="decimal" id="f-metab" placeholder="opcional">
+      </label>
+      <div class="btns">
+        <button type="submit">Salvar medição</button>
+        <button type="button" class="alt" id="btn-remove">Remover última medição</button>
+      </div>
+      <div class="msg full" id="form-msg" aria-live="polite"></div>
+    </form>
+    <p class="note" id="store-note"></p>
+  </section>
+
+  <section class="block" aria-labelledby="h-meta">
+    <h2 id="h-meta">Meta de peso e prazo</h2>
+    <form class="reg" id="form-meta" novalidate>
+      <label>Meta de peso (kg)
+        <input type="text" inputmode="decimal" id="m-peso" placeholder="ex.: 75">
+      </label>
+      <label>Data da meta
+        <input type="date" id="m-data">
+      </label>
+      <div class="btns">
+        <button type="submit">Salvar meta</button>
+        <button type="button" class="alt" id="m-reset">Voltar ao padrão (75 kg, 31/12/2026)</button>
+      </div>
+      <div class="msg full" id="m-msg" aria-live="polite"></div>
+    </form>
+    <p class="note" id="meta-note"></p>
+  </section>
+
+  <section class="block no-print" aria-labelledby="h-bk">
+    <h2 id="h-bk">Backup dos registros</h2>
+    <p class="small mut">Os registros ficam salvos neste navegador, neste aparelho. Exporte um arquivo de backup de tempos em tempos e use Importar para levar os dados a outro aparelho ou recuperar depois de limpar o navegador.</p>
+    <div class="btns" style="margin-top:10px">
+      <button type="button" id="bk-exp">Exportar backup</button>
+      <button type="button" class="alt" id="bk-imp">Importar backup</button>
+      <input type="file" id="bk-file" accept="application/json,.json" hidden>
+    </div>
+    <div class="msg" id="bk-msg" aria-live="polite"></div>
+  </section>
+
+  <section class="block" aria-labelledby="h-next">
+    <h2 id="h-next">Próximos passos</h2>
+    <ul class="steps" id="steps"></ul>
+  </section>
+
+  <footer>Informativo; não substitui avaliação médica.</footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // Dados copiados de data.json (única fonte).
+  var DATA = {
+    paciente: { nome: "Meu acompanhamento", idade: 58, altura_m: 1.65 },
+    projeto: { inicio: "2026-10-19", fim: "2026-12-31", peso_inicio: 86.0, meta: 75.0 },
+    medicoes_previas: [
+      { data: "2026-05-07", hora: "20:45", peso: 87.2, imc: 32.0, gordura_pct: 32.4, musculo_esq_kg: 28.7, agua_pct: 50.5, visceral: 22.0, metab_kcal: 1612 },
+      { data: "2026-05-08", hora: "07:53", peso: 86.55, imc: 31.8, gordura_pct: 32.1, musculo_esq_kg: 28.6, agua_pct: 50.6, visceral: 22.0, metab_kcal: 1604 },
+      { data: "2026-06-28", hora: "20:16", peso: 86.15, imc: 31.6, gordura_pct: 32.0, musculo_esq_kg: 28.6, agua_pct: 50.6, visceral: 21.5, metab_kcal: 1598 },
+      { data: "2026-07-21", hora: "08:07", peso: 85.75, imc: 31.5, gordura_pct: 31.9, musculo_esq_kg: 28.5, agua_pct: 50.7, visceral: 21.5, metab_kcal: 1593 },
+      { data: "2026-07-21", hora: "21:07", peso: 85.05, imc: 31.2, gordura_pct: 31.6, musculo_esq_kg: 28.4, agua_pct: 50.8, visceral: 21.0, metab_kcal: 1584 },
+      { data: "2026-07-25", hora: "12:08", peso: 86.0, imc: 31.6, gordura_pct: 31.9, musculo_esq_kg: 28.5, agua_pct: 50.7, visceral: 21.5, metab_kcal: 1596 }
+    ],
+    medicoes_projeto: [],
+    guia_2026: ["US abdome total", "US próstata via abdominal", "Hemograma completo", "Ureia", "PSA total", "Glicemia em jejum", "Colesterol total e frações + triglicérides", "PSA livre", "Hemoglobina glicada (HbA1c)", "Urina tipo 1", "Creatinina"],
+    mounjaro: {
+      produto: "FR tirzepatida 60 mg/2,4 mL",
+      datas_aplicacao: ["2026-10-20", "2026-10-27", "2026-11-03", "2026-11-10", "2026-11-17", "2026-11-24", "2026-12-01", "2026-12-08", "2026-12-15", "2026-12-22", "2026-12-29"],
+      cenarios_multiplicador: { conservador: 0.6, base: 1.0, otimista: 1.4 },
+      teto_perda_semanal_pct: 1.2
+    }
+  };
+
+  var DAY_MS = 86400000;
+  var META = DATA.projeto.meta;
+  var PESO_INI = DATA.projeto.peso_inicio;
+  var ALTURA = DATA.paciente.altura_m;
+  var TETO = DATA.mounjaro.teto_perda_semanal_pct;
+  var MULT = DATA.mounjaro.cenarios_multiplicador;
+  var HZ = 730;
+  var WD = ["domingo", "segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado"];
+  var MESES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+
+  function parseISO(s) { var p = s.split("-"); return new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2])); }
+  function day0(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+  function addDays(d, n) { return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); }
+  function pad2(n) { return (n < 10 ? "0" : "") + n; }
+  function fmtData(d) { return pad2(d.getDate()) + "/" + pad2(d.getMonth() + 1) + "/" + d.getFullYear(); }
+  function fmtDM(d) { return pad2(d.getDate()) + "/" + pad2(d.getMonth() + 1); }
+  function fmt(v, dec) {
+    if (dec === undefined) { dec = 1; }
+    return v.toFixed(dec).replace(".", ",");
+  }
+  function fmtSigned(v, dec) {
+    var s = fmt(Math.abs(v), dec);
+    if (v > 0) { return "+" + s; }
+    if (v < 0) { return "−" + s; }
+    return s;
+  }
+
+  var START = parseISO(DATA.projeto.inicio);
+  var END = parseISO(DATA.projeto.fim);
+  var DIAS = Math.round((END - START) / DAY_MS); // 73
+
+  function dayIdx(d) { return Math.round((day0(d) - START) / DAY_MS); }
+
+  // Modelo: mesma regra do proj.py. Peso no inicio do dia d.
+  function taxa(semana, mult) {
+    var base = semana <= 4 ? 0.5 : (semana <= 8 ? 0.8 : 1.0);
+    return Math.min(base * mult, TETO) / 100;
+  }
+  function avanca(w, d, mult) {
+    var semana = Math.floor(d / 7) + 1;
+    return w * Math.pow(1 - taxa(semana, mult), 1 / 7);
+  }
+  function trajetoria(w0, n, mult) {
+    var arr = [w0];
+    var w = w0;
+    for (var d = 0; d < n; d++) { w = avanca(w, d, mult); arr.push(w); }
+    return arr;
+  }
+  function pesoEm(w0, d0, dAlvo, mult) {
+    var w = w0;
+    for (var d = d0; d < dAlvo; d++) { w = avanca(w, d, mult); }
+    return w;
+  }
+  function diaMeta(w0, d0, mult) {
+    var w = w0;
+    var d = d0;
+    if (w <= META) { return d; }
+    for (var i = 0; i < HZ; i++) {
+      w = avanca(w, d, mult);
+      d++;
+      if (w <= META) { return d; }
+    }
+    return null;
+  }
+  var BASE = {
+    conservador: trajetoria(PESO_INI, HZ, MULT.conservador),
+    base: trajetoria(PESO_INI, HZ, MULT.base),
+    otimista: trajetoria(PESO_INI, HZ, MULT.otimista)
+  };
+
+  // Estado. Os registros ficam no banco do artefato (db); sem db, valem só nesta tela.
+  var cfg = { meta: DATA.projeto.meta, fim: DATA.projeto.fim };
+  var stored = [];
+  var aplic = {};
+  var exerc = [];
+  var dbh = null;
+  var dbStatus = "carregando";
+  var syncMeta = true;
+  var apInit = false;
+  var META_SEMANAL_MIN = 150;
+  var WDS = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"];
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function iso(d) { return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()); }
+  function okISO(s) { return typeof s === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s); }
+  function fmtISO(s) { return okISO(s) ? fmtData(parseISO(s)) : "--"; }
+  function num(v) { var n = Number(v); return isFinite(n) ? n : 0; }
+  function mgTxt(x) { return String(num(x)).replace(".", ","); }
+  function metaTxt() { var s = fmt(META, 1); return s.slice(-2) === ",0" ? s.slice(0, -2) : s; }
+
+  function applyGoal(list) {
+    META = cfg.meta;
+    END = parseISO(cfg.fim);
+    DIAS = Math.max(14, Math.min(700, Math.round((END - START) / DAY_MS)));
+    var lo = META;
+    var hi = PESO_INI;
+    (list || []).forEach(function (m) {
+      if (m.peso < lo) { lo = m.peso; }
+      if (m.peso > hi) { hi = m.peso; }
+    });
+    Y_MIN = 2 * Math.floor((lo - 1) / 2);
+    Y_MAX = 2 * Math.ceil((hi + 1) / 2);
+  }
+
+  function cp(d) {
+    var src = d.data() || {};
+    var o = {};
+    for (var k in src) { if (Object.prototype.hasOwnProperty.call(src, k)) { o[k] = src[k]; } }
+    o._id = d.id;
+    return o;
+  }
+  function onErr() { dbStatus = "local"; render(); }
+
+  // Grava no db; sem db, aplica só na tela.
+  function gravar(path, obj, local) {
+    if (dbh) { return dbh.doc(path).set(obj).then(function () { return true; }); }
+    local();
+    render();
+    return Promise.resolve(false);
+  }
+  function apagar(path, local) {
+    if (dbh) { return dbh.doc(path).delete().then(function () { return true; }); }
+    local();
+    render();
+    return Promise.resolve(false);
+  }
+
+  function startDb() {
+    if (!window.claude || typeof window.claude.use !== "function") { dbStatus = "local"; render(); return; }
+    window.claude.use("db").then(function (db) {
+      if (!db) { dbStatus = "local"; render(); return; }
+      dbh = db;
+      dbStatus = "ativo";
+      db.doc("config/meta").onSnapshot(function (s) {
+        var d = s.exists ? s.data() : null;
+        if (d && typeof d.meta === "number" && okISO(d.fim)) { cfg = { meta: d.meta, fim: d.fim }; }
+        else { cfg = { meta: DATA.projeto.meta, fim: DATA.projeto.fim }; }
+        syncMeta = true;
+        render();
+      }, onErr);
+      db.collection("medicoes").onSnapshot(function (q) { stored = q.docs.map(cp); render(); }, onErr);
+      db.collection("aplicacoes").onSnapshot(function (q) {
+        aplic = {};
+        q.docs.forEach(function (d) { aplic[d.id] = cp(d); });
+        render();
+      }, onErr);
+      db.collection("exercicios").onSnapshot(function (q) { exerc = q.docs.map(cp); render(); }, onErr);
+    }).catch(function () { dbStatus = "local"; render(); });
+  }
+
+  function medicoesProjeto() {
+    var all = DATA.medicoes_projeto.concat(stored);
+    var list = all.map(function (m, i) {
+      var c = {};
+      for (var k in m) { if (Object.prototype.hasOwnProperty.call(m, k)) { c[k] = m[k]; } }
+      c.dt = parseISO(m.data);
+      c.ord = i;
+      return c;
+    });
+    list.sort(function (a, b) {
+      if (a.dt - b.dt !== 0) { return a.dt - b.dt; }
+      return a.ord - b.ord;
+    });
+    return list;
+  }
+
+  // Primeira pesagem de cada dia, indexada pelo dia do projeto.
+  function repPorDia(list) {
+    var m = new Map();
+    list.forEach(function (x) {
+      var k = dayIdx(x.dt);
+      if (!m.has(k)) { m.set(k, x); }
+    });
+    return m;
+  }
+  function mediaDias(rep, de, ate) {
+    var s = 0;
+    var n = 0;
+    for (var k = de; k <= ate; k++) {
+      if (rep.has(k)) { s += rep.get(k).peso; n++; }
+    }
+    return n ? { v: s / n } : null;
+  }
+  function mediaMes(rep, ano, mes) {
+    var s = 0;
+    var n = 0;
+    rep.forEach(function (x) {
+      if (x.dt.getFullYear() === ano && x.dt.getMonth() === mes) { s += x.peso; n++; }
+    });
+    return n ? { v: s / n } : null;
+  }
+
+  function el(id) { return document.getElementById(id); }
+  function setHTML(id, html) { var e = el(id); if (e) { e.innerHTML = html; } }
+
+  function deltaHTML(atual, anterior) {
+    var d = atual.v - anterior.v;
+    var pct = d / anterior.v * 100;
+    var cls = d < -0.005 ? "ok" : (d > 0.005 ? "bad" : "neutral");
+    return '<span class="delta ' + cls + '">' + fmtSigned(d, 2) + " kg (" + fmtSigned(pct, 1) + "%)</span>";
+  }
+
+  function cardComp(titulo, atual, anterior, rotulo, aguardando) {
+    var corpo;
+    if (aguardando) {
+      corpo = '<p class="mut">Aguardando primeira pesagem em 19/10</p>';
+    } else if (!atual) {
+      corpo = '<p class="mut">Sem medição neste período</p>';
+    } else {
+      corpo = '<p class="big">' + fmt(atual.v, 2) + " kg</p>";
+      if (!anterior) {
+        corpo += '<p class="small mut">' + rotulo + ": sem medição para comparar</p>";
+      } else {
+        corpo += '<p class="small mut">' + rotulo + ": " + fmt(anterior.v, 2) + " kg</p>";
+        corpo += "<p>" + deltaHTML(atual, anterior) + "</p>";
+      }
+    }
+    return '<div class="card"><h3>' + titulo + "</h3>" + corpo + "</div>";
+  }
+
+  function statusAtual(list) {
+    if (!list.length) { return { txt: "Aguardando início", cls: "neutral" }; }
+    var last = list[list.length - 1];
+    var d = dayIdx(last.dt);
+    var w = last.peso;
+    var dClamp = Math.max(0, Math.min(d, HZ));
+    var gap = w - BASE.base[dClamp];
+    if (gap <= 0.5) { return { txt: "No ritmo", cls: "ok" }; }
+    var wFim = pesoEm(w, d, Math.max(DIAS, d), MULT.otimista);
+    if (wFim <= META) { return { txt: "Atrasado", cls: "warn" }; }
+    return { txt: "Fora do alcance do prazo", cls: "bad" };
+  }
+
+  function renderLabels() {
+    var mt = metaTxt();
+    var fim = fmtData(END);
+    el("hdr-sub").textContent = "58 anos · 1,65 m · início 19/10/2026 · meta " + mt + " kg até " + fim;
+    el("hero-imc-n").textContent = "meta " + fmt(META / (ALTURA * ALTURA), 1);
+    el("hero-falta-k").textContent = "Falta para " + mt + " kg";
+    el("hero-falta-n").textContent = "perda total necessária: " + fmt(PESO_INI - META, 1) + " kg";
+    el("hero-base-n").textContent = "peso previsto em " + fmtDM(END);
+    el("h-chart").textContent = "Trajetória de peso: 19/10 a " + fim;
+    el("leg-meta").textContent = "Meta " + mt + " kg";
+    el("h-proj").textContent = "Projeção até " + fim;
+    el("proj-th31").textContent = "Peso em " + fmtDM(END);
+    el("proj-thmeta").textContent = "Chega a " + mt + " kg";
+  }
+
+  function renderHero(list, hojeIdx) {
+    var W = list.length ? list[list.length - 1].peso : PESO_INI;
+    var last = list.length ? list[list.length - 1] : null;
+    var fim = fmtData(END);
+
+    var dia;
+    if (hojeIdx < 0) {
+      var f = -hojeIdx;
+      dia = "Pré-início";
+      el("hero-dia-sub").textContent = "Faltam " + f + (f === 1 ? " dia" : " dias") + " para o início em 19/10/2026.";
+    } else if (hojeIdx <= DIAS) {
+      dia = "Dia " + Math.min(hojeIdx + 1, DIAS) + " de " + DIAS;
+      el("hero-dia-sub").textContent = "Projeto de 19/10 a " + fim + ".";
+    } else {
+      dia = "Prazo encerrado";
+      el("hero-dia-sub").textContent = "Período de 19/10 a " + fim + " terminou.";
+    }
+    el("hero-dia").textContent = dia;
+
+    el("hero-peso").textContent = fmt(W, 2) + " kg";
+    el("hero-peso-sub").textContent = last ? "Pesagem de " + fmtData(last.dt) : "Partida, sem pesagem do projeto";
+    el("hero-imc").textContent = fmt(W / (ALTURA * ALTURA), 1);
+    var falta = W - META;
+    el("hero-falta").textContent = falta <= 0 ? "Meta atingida" : fmt(falta, 2) + " kg";
+    el("hero-base").textContent = fmt(BASE.base[DIAS], 1) + " kg";
+
+    var st = statusAtual(list);
+    var pill = el("hero-status");
+    pill.textContent = st.txt;
+    pill.className = "pill " + st.cls;
+  }
+
+  // Aplicações semanais (terças-feiras, a partir de 20/10/2026).
+  function plannedMg(s) { return s <= 4 ? 2.5 : (s <= 8 ? 5 : (s <= 12 ? 7.5 : 10)); }
+  function agenda() {
+    var out = [];
+    for (var i = 0; i < 60; i++) {
+      var d = addDays(START, 7 * i + 1);
+      if (i >= 11 && d > END) { break; }
+      out.push({ semana: i + 1, data: d, iso: iso(d), mg: plannedMg(i + 1) });
+    }
+    return out;
+  }
+
+  function renderAviso() {
+    var box = el("aviso");
+    var h = iso(hojeDia);
+    var am = iso(addDays(hojeDia, 1));
+    var alvo = null;
+    var ag = agenda();
+    for (var i = 0; i < ag.length; i++) {
+      if (!aplic[ag[i].iso] && ag[i].iso <= am) { alvo = ag[i]; break; }
+    }
+    if (!alvo) { box.hidden = true; box.innerHTML = ""; return; }
+    var quando = alvo.iso < h ? "Aplicação atrasada" : (alvo.iso === h ? "Hoje é dia de aplicação" : "Amanhã é dia de aplicação");
+    box.className = "banner" + (alvo.iso < h ? " bad" : "");
+    box.innerHTML = "<div><strong>" + quando + ":</strong> semana " + alvo.semana + ", " + WDS[alvo.data.getDay()] + " " + fmtData(alvo.data) +
+      ". Dose prevista no esquema: " + doseDaSemana(alvo.semana) + " (confirmar com o médico).</div>" +
+      '<button type="button" data-iso="' + alvo.iso + '">Confirmar aplicação</button>';
+    box.hidden = false;
+  }
+
+  function renderCards(list, hojeIdx, hoje) {
+    var aguardando = list.length === 0;
+    var rep = repPorDia(list);
+    var hojeAtual = rep.has(hojeIdx) ? { v: rep.get(hojeIdx).peso } : null;
+    var ontem = rep.has(hojeIdx - 1) ? { v: rep.get(hojeIdx - 1).peso } : null;
+    var semAtual = mediaDias(rep, hojeIdx - 6, hojeIdx);
+    var semAnt = mediaDias(rep, hojeIdx - 13, hojeIdx - 7);
+    var mesAtual = mediaMes(rep, hoje.getFullYear(), hoje.getMonth());
+    var pm = hoje.getMonth() === 0 ? 11 : hoje.getMonth() - 1;
+    var pa = hoje.getMonth() === 0 ? hoje.getFullYear() - 1 : hoje.getFullYear();
+    var mesAnt = mediaMes(rep, pa, pm);
+
+    var html = "";
+    html += cardComp("Hoje vs dia anterior", hojeAtual, ontem, "Dia anterior", aguardando);
+    html += cardComp("Semana vs semana anterior", semAtual, semAnt, "Semana anterior (média)", aguardando);
+    html += cardComp("Mês vs mês anterior", mesAtual, mesAnt, MESES[pm] + " (média)", aguardando);
+    setHTML("cards", html);
+  }
+
+  // Gráfico
+  var VB_W = 360;
+  var VB_H = 270;
+  var PL = 38;
+  var PR = 352;
+  var PT = 14;
+  var PB = 222;
+  var Y_MIN = 74;
+  var Y_MAX = 88;
+  function xs(d) { return PL + (d / DIAS) * (PR - PL); }
+  function ys(w) { return PB - ((w - Y_MIN) / (Y_MAX - Y_MIN)) * (PB - PT); }
+
+  function linhaPontos(arr) {
+    var p = [];
+    for (var d = 0; d <= DIAS; d++) { p.push(xs(d).toFixed(1) + "," + ys(arr[d]).toFixed(1)); }
+    return p.join(" ");
+  }
+
+  function doseDaSemana(s) {
+    if (s <= 4) { return "2,5 mg"; }
+    if (s <= 8) { return "5 mg"; }
+    if (s <= 12) { return "7,5 mg"; }
+    return "10 a 15 mg";
+  }
+
+  function appDias() {
+    return agenda().map(function (a) {
+      return { d: dayIdx(a.data), semana: a.semana, dose: doseDaSemana(a.semana), data: a.data, iso: a.iso };
+    });
+  }
+
+  function buildChart(list) {
+    var s = [];
+    s.push('<svg viewBox="0 0 ' + VB_W + " " + VB_H + '" role="img" aria-label="Gráfico de peso com os três cenários, a meta de ' + metaTxt() + ' kg e as pesagens do projeto" id="chart-svg">');
+    for (var g = Y_MIN; g <= Y_MAX; g += 2) {
+      s.push('<line class="grid" x1="' + PL + '" x2="' + PR + '" y1="' + ys(g).toFixed(1) + '" y2="' + ys(g).toFixed(1) + '"/>');
+      s.push('<text class="tick" x="' + (PL - 5) + '" y="' + (ys(g) + 3.5).toFixed(1) + '" text-anchor="end">' + g + "</text>");
+    }
+    var band = [];
+    var d;
+    for (d = 0; d <= DIAS; d++) { band.push(xs(d).toFixed(1) + "," + ys(BASE.conservador[d]).toFixed(1)); }
+    for (d = DIAS; d >= 0; d--) { band.push(xs(d).toFixed(1) + "," + ys(BASE.otimista[d]).toFixed(1)); }
+    s.push('<polygon class="s-band" points="' + band.join(" ") + '"/>');
+    s.push('<line class="s-meta" x1="' + PL + '" x2="' + PR + '" y1="' + ys(META).toFixed(1) + '" y2="' + ys(META).toFixed(1) + '"/>');
+    s.push('<text class="s-label" x="' + (PR - 2) + '" y="' + (ys(META) - 4).toFixed(1) + '" text-anchor="end">meta ' + metaTxt() + "</text>");
+    s.push('<polyline class="s-cons" points="' + linhaPontos(BASE.conservador) + '"/>');
+    s.push('<polyline class="s-otim" points="' + linhaPontos(BASE.otimista) + '"/>');
+    s.push('<polyline class="s-base" points="' + linhaPontos(BASE.base) + '"/>');
+
+    var segs = [[0, 28, "2,5 mg"], [28, 56, "5 mg"], [56, 84, "7,5 mg"], [84, DIAS, "≥10 mg"]];
+    segs.forEach(function (sg) {
+      var a = sg[0];
+      var b = sg[2] === "≥10 mg" ? DIAS : Math.min(sg[1], DIAS);
+      if (a >= DIAS) { return; }
+      var x1 = xs(a);
+      var x2 = xs(b);
+      s.push('<rect class="s-seg" x="' + x1.toFixed(1) + '" y="232" width="' + (x2 - x1).toFixed(1) + '" height="14"/>');
+      s.push('<text class="s-seg-txt" x="' + ((x1 + x2) / 2).toFixed(1) + '" y="243">' + sg[2] + "</text>");
+    });
+    appDias().forEach(function (a) {
+      if (a.d >= 0 && a.d <= DIAS) {
+        s.push('<line class="s-app" x1="' + xs(a.d).toFixed(1) + '" x2="' + xs(a.d).toFixed(1) + '" y1="232" y2="246"/>');
+        if (aplic[a.iso]) { s.push('<circle class="s-ok" cx="' + xs(a.d).toFixed(1) + '" cy="228" r="3"/>'); }
+      }
+    });
+
+    list.forEach(function (m) {
+      var k = dayIdx(m.dt);
+      if (k >= 0 && k <= DIAS) {
+        s.push('<circle class="s-real" cx="' + xs(k).toFixed(1) + '" cy="' + ys(m.peso).toFixed(1) + '" r="3.6"/>');
+      }
+    });
+
+    var passo = DIAS > 150 ? 28 : 14;
+    var ticks = [];
+    for (var k = 0; k < DIAS - Math.floor(passo / 2); k += passo) { ticks.push(k); }
+    ticks.push(DIAS);
+    ticks.forEach(function (k) {
+      var anchor = k === 0 ? "start" : (k === DIAS ? "end" : "middle");
+      s.push('<text class="tick" x="' + xs(k).toFixed(1) + '" y="262" text-anchor="' + anchor + '">' + fmtDM(addDays(START, k)) + "</text>");
+    });
+
+    s.push('<line id="cross" class="s-cross" x1="0" x2="0" y1="' + PT + '" y2="' + PB + '" visibility="hidden"/>');
+    s.push('<rect class="s-overlay" id="overlay" x="' + PL + '" y="' + PT + '" width="' + (PR - PL) + '" height="' + (PB - PT) + '"/>');
+    s.push("</svg>");
+    return s.join("");
+  }
+
+  function infoDia(d, list) {
+    var dt = addDays(START, d);
+    var txt = "<strong>" + fmtData(dt) + "</strong><br>";
+    txt += "Conservador: " + fmt(BASE.conservador[d], 1) + " kg<br>";
+    txt += "Base: " + fmt(BASE.base[d], 1) + " kg<br>";
+    txt += "Otimista: " + fmt(BASE.otimista[d], 1) + " kg";
+    var real = null;
+    list.forEach(function (m) { if (dayIdx(m.dt) === d) { real = m; } });
+    if (real) { txt += "<br>Real: " + fmt(real.peso, 2) + " kg"; }
+    appDias().forEach(function (a) {
+      if (a.d === d) {
+        var r = aplic[a.iso];
+        txt += "<br>Aplicação: semana " + a.semana + ", " + a.dose + (r ? " (aplicada: " + mgTxt(r.dose_mg) + " mg)" : " (prevista)");
+      }
+    });
+    return txt;
+  }
+
+  function bindChart(list) {
+    var svg = document.getElementById("chart-svg");
+    var tip = el("chart-tip");
+    var cross = document.getElementById("cross");
+    var overlay = document.getElementById("overlay");
+    if (!svg || !overlay) { return; }
+
+    function mostra(ev) {
+      var r = svg.getBoundingClientRect();
+      var vx = (ev.clientX - r.left) / r.width * VB_W;
+      var d = Math.round((vx - PL) / (PR - PL) * DIAS);
+      if (d < 0) { d = 0; }
+      if (d > DIAS) { d = DIAS; }
+      var x = xs(d);
+      cross.setAttribute("x1", x.toFixed(1));
+      cross.setAttribute("x2", x.toFixed(1));
+      cross.setAttribute("visibility", "visible");
+      tip.innerHTML = infoDia(d, list);
+      tip.hidden = false;
+      var pct = x / VB_W * 100;
+      var left = Math.max(22, Math.min(78, pct));
+      tip.style.left = left + "%";
+    }
+    function esconde() {
+      cross.setAttribute("visibility", "hidden");
+      tip.hidden = true;
+    }
+    overlay.addEventListener("pointermove", mostra);
+    overlay.addEventListener("pointerdown", mostra);
+    overlay.addEventListener("pointerleave", esconde);
+    overlay.addEventListener("pointercancel", esconde);
+  }
+
+  function renderChart(list) {
+    setHTML("chart", buildChart(list));
+    bindChart(list);
+  }
+
+  function renderTabela(list) {
+    var rep = repPorDia(list);
+    var ks = [];
+    for (var k = 0; k < DIAS; k += 7) { ks.push(k); }
+    ks.push(DIAS);
+    var html = "";
+    ks.forEach(function (k) {
+      var real = rep.has(k) ? fmt(rep.get(k).peso, 2) : "--";
+      html += "<tr><td>" + fmtDM(addDays(START, k)) + '</td><td class="num">' + fmt(BASE.conservador[k], 1) +
+        '</td><td class="num">' + fmt(BASE.base[k], 1) + '</td><td class="num">' + fmt(BASE.otimista[k], 1) +
+        '</td><td class="num">' + real + "</td></tr>";
+    });
+    setHTML("tabela-body", html);
+  }
+
+  function renderProjecao(list) {
+    var start = list.length ? { w: list[list.length - 1].peso, d: dayIdx(list[list.length - 1].dt) } : { w: PESO_INI, d: 0 };
+    var startTxt = list.length
+      ? "Ponto de partida da projeção: última pesagem, " + fmt(start.w, 2) + " kg em " + fmtData(list[list.length - 1].dt) + "."
+      : "Ponto de partida da projeção: " + fmt(PESO_INI, 1) + " kg em 19/10/2026 (partida, sem pesagem do projeto).";
+    el("proj-start").textContent = startTxt;
+
+    var mt = metaTxt();
+    var fim = fmtData(END);
+    var nomes = { conservador: "Conservador (×0,6)", base: "Base (×1,0)", otimista: "Otimista (×1,4)" };
+    var linhas = "";
+    var resultados = [];
+    ["conservador", "base", "otimista"].forEach(function (k) {
+      var w31 = pesoEm(start.w, start.d, Math.max(DIAS, start.d), MULT[k]);
+      var dm = diaMeta(start.w, start.d, MULT[k]);
+      var chega = dm === null ? "após 2028" : fmtData(addDays(START, dm));
+      resultados.push({ k: k, w31: w31, dm: dm });
+      linhas += "<tr><td>" + nomes[k] + '</td><td class="num">' + fmt(w31, 1) + ' kg</td><td class="num">' + chega + "</td></tr>";
+    });
+    setHTML("proj-body", linhas);
+
+    var alcanca = resultados.filter(function (r) { return r.w31 <= META; });
+    var box = el("proj-verdict");
+    var txt;
+    if (alcanca.length === 3) {
+      box.className = "verdict ok";
+      txt = "<p><strong>Meta de " + mt + " kg até " + fim + " alcançável nos três cenários.</strong></p>";
+    } else if (alcanca.length) {
+      box.className = "verdict ok";
+      txt = "<p><strong>Meta de " + mt + " kg até " + fim + " alcançável no cenário " + alcanca.map(function (r) { return r.k; }).join(" e ") +
+        ".</strong> Os outros cenários ficam acima de " + mt + " kg.</p>";
+    } else {
+      box.className = "verdict";
+      var base = resultados[1];
+      var otim = resultados[2];
+      txt = "<p><strong>A meta de " + mt + " kg até " + fim + " não é provável.</strong> Nenhum cenário chega lá: o otimista fica em " +
+        fmt(otim.w31, 1) + " kg e o base em " + fmt(base.w31, 1) + " kg. Pelo cálculo, o base chega a " + mt + " kg em " +
+        (base.dm === null ? "data além de 2028" : fmtData(addDays(START, base.dm))) + ".</p>";
+    }
+    box.innerHTML = txt;
+
+    var nota = "Taxas do modelo: semanas 1-4 a 0,5%, 5-8 a 0,8% e 9 em diante a 1,0% de perda por semana, multiplicadas pelo cenário e limitadas a 1,2%. ";
+    var diasRest = DIAS - start.d;
+    if (start.w <= META) { nota += "Meta já atingida."; }
+    else if (diasRest <= 0) { nota += "Prazo encerrado."; }
+    else {
+      var kgSem = (start.w - META) / diasRest * 7;
+      var pctSem = (1 - Math.pow(META / start.w, 7 / diasRest)) * 100;
+      nota += "Ritmo exigido para " + mt + " kg em " + fmtDM(END) + ": " + fmt(kgSem, 2) + " kg por semana (" + fmt(pctSem, 2) + "% por semana, composto).";
+    }
+    el("proj-note").textContent = nota;
+  }
+
+  function ultimoComValor(list, campo) {
+    for (var i = list.length - 1; i >= 0; i--) {
+      if (list[i][campo] !== undefined && list[i][campo] !== null) { return list[i]; }
+    }
+    return null;
+  }
+
+  function renderComposicao(list) {
+    var previas = DATA.medicoes_previas.map(function (m) {
+      var c = {};
+      for (var k in m) { if (Object.prototype.hasOwnProperty.call(m, k)) { c[k] = m[k]; } }
+      c.dt = parseISO(m.data);
+      return c;
+    });
+    var campos = [
+      ["Gordura corporal", "gordura_pct", "%", 1],
+      ["Músculo esquelético", "musculo_esq_kg", "kg", 1],
+      ["Água", "agua_pct", "%", 1],
+      ["Gordura visceral", "visceral", "", 1],
+      ["Metabolismo basal", "metab_kcal", "kcal", 0]
+    ];
+    var ultPrevio = previas[previas.length - 1];
+    var html = "";
+    campos.forEach(function (c) {
+      var pv = ultimoComValor(previas, c[1]);
+      var pj = ultimoComValor(list, c[1]);
+      var tPrev = pv ? fmt(pv[c[1]], c[3]) + (c[2] ? " " + c[2] : "") : "--";
+      var tProj = pj ? fmt(pj[c[1]], c[3]) + (c[2] ? " " + c[2] : "") : "--";
+      html += "<tr><td>" + c[0] + '</td><td class="num">' + tPrev + '</td><td class="num">' + tProj + "</td></tr>";
+    });
+    setHTML("comp-body", html);
+    if (ultPrevio) {
+      el("comp-prev-head").textContent = "Prévio " + fmtDM(ultPrevio.dt);
+    }
+
+    var pl = previas.map(function (m) {
+      return "<li>" + fmtDM(m.dt) + "/" + m.dt.getFullYear() + " " + m.hora + " &middot; " + fmt(m.peso, 2) + " kg &middot; gordura " + fmt(m.gordura_pct, 1) + "%</li>";
+    }).join("");
+    setHTML("prior-list", pl);
+  }
+
+  var EXAMES_MES = {
+    "2026-11": ["Glicemia em jejum", "Creatinina", "Ureia", "TGO e TGP"],
+    "2026-12": ["Glicemia em jejum", "Creatinina", "Ureia", "TGO e TGP", "Hemograma"],
+    "2027-03": ["Perfil lipídico", "HbA1c"]
+  };
+
+  function renderPassos(hoje) {
+    var out = "";
+    var pend = agenda().filter(function (a) { return !aplic[a.iso]; })[0];
+    if (pend) {
+      var atras = pend.iso < iso(hoje) ? " (atrasada)" : "";
+      out += "<li><strong>Próxima aplicação" + atras + ":</strong> " + WD[pend.data.getDay()] + ", " + fmtData(pend.data) +
+        " (semana " + pend.semana + "). Dose do esquema: " + doseDaSemana(pend.semana) + ", a confirmar com o médico.</li>";
+    } else {
+      out += "<li><strong>Próxima aplicação:</strong> todas as aplicações da lista foram confirmadas. Confirmar a sequência com o médico.</li>";
+    }
+    var conf = Object.keys(aplic).sort();
+    if (conf.length) {
+      var u = aplic[conf[conf.length - 1]];
+      out += "<li><strong>Última aplicação confirmada:</strong> " + fmtISO(u.data) + ", " + mgTxt(u.dose_mg) + " mg.</li>";
+    }
+    var ref = pend ? pend.data : hoje;
+    var chaveMes = ref.getFullYear() + "-" + pad2(ref.getMonth() + 1);
+    if (EXAMES_MES[chaveMes]) {
+      out += "<li><strong>Exames do mês (" + MESES[ref.getMonth()] + "):</strong> " + EXAMES_MES[chaveMes].join(", ") + ".</li>";
+    } else {
+      out += "<li><strong>Exames pendentes da guia de 14/10/2026:</strong> " + DATA.guia_2026.join(", ") + ".</li>";
+    }
+    out += '<li class="alerta"><strong>Alerta de apresentação:</strong> FR tirzepatida 60 mg/2,4 mL equivale a 4 doses de 15 mg (dose máxima). Não é apresentação de início. Não iniciar com 15 mg; confirmar a apresentação com o prescritor ou a farmácia.</li>';
+    out += "<li><strong>Consulta:</strong> confirmar com o médico prescritor a posologia, os antecedentes (carcinoma medular de tireoide, MEN2, pancreatite) e a meta de peso.</li>";
+    setHTML("steps", out);
+  }
+
+  // ---- Aplicações
+  function opcoesSemana(ag, atual) {
+    var h = "";
+    ag.forEach(function (a) {
+      h += '<option value="' + a.iso + '">Semana ' + a.semana + " · " + WDS[a.data.getDay()] + " " + fmtDM(a.data) + (aplic[a.iso] ? " · aplicada" : "") + "</option>";
+    });
+    return h;
+  }
+
+  function prefillAp(k) {
+    var a = agenda().filter(function (x) { return x.iso === k; })[0];
+    if (!a) { return; }
+    var r = aplic[k];
+    el("ap-sem").value = k;
+    el("ap-data").value = r && okISO(r.data) ? r.data : iso(hojeDia);
+    el("ap-dose").value = r ? String(num(r.dose_mg)) : String(a.mg);
+    el("ap-local").value = r && r.local ? r.local : "abdômen";
+    el("ap-obs").value = r && r.obs ? r.obs : "";
+    el("ap-undo").disabled = !r;
+    el("ap-form-t").textContent = r ? "Editar aplicação confirmada" : "Confirmar aplicação";
+  }
+
+  function renderAplic() {
+    var ag = agenda();
+    var h = iso(hojeDia);
+    var html = "";
+    ag.forEach(function (a) {
+      var r = aplic[a.iso];
+      var st = "Agendada";
+      var cls = "neutral";
+      if (r) { st = "Aplicada"; cls = "ok"; }
+      else if (a.iso < h) { st = "Pendente"; cls = "bad"; }
+      else if (a.iso === h) { st = "Hoje"; cls = "warn"; }
+      var det = "";
+      if (r) {
+        det = fmtISO(r.data) + " · " + mgTxt(r.dose_mg) + " mg" + (r.local ? " · " + esc(r.local) : "") + (r.obs ? " · " + esc(r.obs) : "");
+      }
+      html += "<tr><td>" + a.semana + "</td><td>" + WDS[a.data.getDay()] + " " + fmtDM(a.data) + "</td><td>" + doseDaSemana(a.semana) +
+        '</td><td><span class="pill sm ' + cls + '">' + st + "</span>" + (det ? '<div class="small mut">' + det + "</div>" : "") +
+        '</td><td><button type="button" class="alt mini" data-iso="' + a.iso + '">' + (r ? "Editar" : "Confirmar") + "</button></td></tr>";
+    });
+    setHTML("ap-body", html);
+
+    var sel = el("ap-sem");
+    var cur = sel.value;
+    sel.innerHTML = opcoesSemana(ag);
+    if (!apInit) {
+      var pend = ag.filter(function (a) { return !aplic[a.iso]; })[0] || ag[0];
+      sel.value = pend.iso;
+      apInit = true;
+      prefillAp(pend.iso);
+    } else if (cur && sel.querySelector('option[value="' + cur + '"]')) {
+      sel.value = cur;
+      el("ap-undo").disabled = !aplic[cur];
+    }
+  }
+
+  // ---- Exercícios
+  function semanaIni(d) { return addDays(day0(d), -((d.getDay() + 6) % 7)); }
+  function somaEx(de, ate) {
+    var r = { n: 0, km: 0, min: 0, kcal: 0, kmP: 0, minP: 0 };
+    var a = iso(de);
+    var b = iso(ate);
+    exerc.forEach(function (e) {
+      if (!okISO(e.data) || e.data < a || e.data > b) { return; }
+      var km = num(e.distancia_km);
+      var mi = num(e.tempo_min);
+      r.n++;
+      r.km += km;
+      r.min += mi;
+      r.kcal += num(e.calorias);
+      if (km > 0 && mi > 0) { r.kmP += km; r.minP += mi; }
+    });
+    return r;
+  }
+  function ritmo(r) {
+    if (!r.kmP) { return "--"; }
+    var p = r.minP / r.kmP;
+    var m = Math.floor(p);
+    var s = Math.round((p - m) * 60);
+    if (s === 60) { m++; s = 0; }
+    return m + ":" + pad2(s) + " min/km";
+  }
+  function cardEx(titulo, r, semanal) {
+    var corpo = '<p class="big">' + fmt(r.min, 0) + " min</p>";
+    corpo += '<p class="small mut">' + r.n + (r.n === 1 ? " sessão" : " sessões") + " · " + fmt(r.km, 1) + " km · " + fmt(r.kcal, 0) + " kcal</p>";
+    corpo += '<p class="small mut">Ritmo médio: ' + ritmo(r) + "</p>";
+    if (semanal) {
+      var pct = Math.min(100, Math.round(r.min / META_SEMANAL_MIN * 100));
+      corpo += '<div class="bar" role="img" aria-label="' + pct + '% da meta semanal de ' + META_SEMANAL_MIN + ' minutos"><span style="width:' + pct + '%"></span></div>';
+      corpo += '<p class="small mut">' + pct + "% da meta de " + META_SEMANAL_MIN + " min por semana</p>";
+    }
+    return '<div class="card"><h3>' + titulo + "</h3>" + corpo + "</div>";
+  }
+
+  function renderExerc() {
+    var ini = semanaIni(hojeDia);
+    var fim = addDays(ini, 6);
+    var iniAnt = addDays(ini, -7);
+    var mesIni = new Date(hojeDia.getFullYear(), hojeDia.getMonth(), 1);
+    var mesFim = new Date(hojeDia.getFullYear(), hojeDia.getMonth() + 1, 0);
+    var html = cardEx("Esta semana (seg a dom)", somaEx(ini, fim), true) +
+      cardEx("Semana anterior", somaEx(iniAnt, addDays(ini, -1)), true) +
+      cardEx("Mês de " + MESES[hojeDia.getMonth()], somaEx(mesIni, mesFim), false);
+    setHTML("ex-cards", html);
+
+    var lista = exerc.filter(function (e) { return okISO(e.data); }).sort(function (a, b) {
+      return a.data < b.data ? 1 : (a.data > b.data ? -1 : (a._id < b._id ? 1 : -1));
+    }).slice(0, 15);
+    var rows = "";
+    lista.forEach(function (e) {
+      rows += "<tr><td>" + fmtDM(parseISO(e.data)) + "</td><td>" + esc(e.tipo || "Caminhada") + '</td><td class="num">' + (num(e.distancia_km) ? fmt(num(e.distancia_km), 2) : "--") +
+        '</td><td class="num">' + (num(e.tempo_min) ? fmt(num(e.tempo_min), 0) : "--") + '</td><td class="num">' + (num(e.calorias) ? fmt(num(e.calorias), 0) : "--") +
+        '</td><td><button type="button" class="alt mini" data-id="' + esc(e._id) + '" aria-label="Remover exercício">Remover</button></td></tr>';
+    });
+    setHTML("ex-body", rows || '<tr><td colspan="6" class="mut">Nenhum exercício registrado ainda.</td></tr>');
+  }
+
+  function syncMetaForm() {
+    if (!syncMeta) { return; }
+    syncMeta = false;
+    if (document.activeElement !== el("m-peso")) { el("m-peso").value = metaTxt(); }
+    if (document.activeElement !== el("m-data")) { el("m-data").value = cfg.fim; }
+    el("meta-note").textContent = "Meta atual: " + metaTxt() + " kg até " + fmtData(END) + " (" + DIAS + " dias a partir de 19/10/2026). A projeção e o gráfico usam estes valores.";
+  }
+
+  var stInfo = el("store-note");
+  function renderStore() {
+    var n = stored.length;
+    var t;
+    if (dbStatus === "ativo") {
+      t = "Os registros ficam salvos neste navegador, neste aparelho (" + n + (n === 1 ? " medição" : " medições") +
+        ", " + Object.keys(aplic).length + " aplicações, " + exerc.length + " exercícios). O histórico oficial da balança é atualizado quando a planilha for reenviada.";
+    } else if (dbStatus === "local") {
+      t = "O navegador bloqueou o armazenamento local. Os registros valem só enquanto a página estiver aberta; use Exportar backup para guardá-los.";
+    } else {
+      t = "Carregando registros salvos...";
+    }
+    stInfo.textContent = t;
+    el("btn-remove").disabled = n === 0;
+  }
+
+  function parseNum(v) {
+    var s = String(v).trim().replace(",", ".");
+    if (s === "") { return null; }
+    var n = Number(s);
+    return isFinite(n) ? n : null;
+  }
+  function parseTempo(v) {
+    var s = String(v).trim();
+    if (s.indexOf(":") > 0) {
+      var p = s.split(":");
+      var h = Number(p[0]);
+      var m = Number(p[1]);
+      return isFinite(h) && isFinite(m) ? h * 60 + m : null;
+    }
+    return parseNum(s);
+  }
+
+  function setMsg(t) { el("form-msg").textContent = t; }
+  function msgId(id, t) { el(id).textContent = t; }
+  var ERRO_SALVAR = "Não foi possível salvar. Confirme que você abriu o painel com acesso de edição e tente de novo.";
+
+  var hojeRef = new Date();
+  var hojeDia = day0(hojeRef);
+  var hojeIdx = dayIdx(hojeRef);
+
+  function render() {
+    var list = medicoesProjeto();
+    applyGoal(list);
+    renderLabels();
+    renderAviso();
+    renderHero(list, hojeIdx);
+    renderCards(list, hojeIdx, hojeDia);
+    renderChart(list);
+    renderTabela(list);
+    renderProjecao(list);
+    renderAplic();
+    renderExerc();
+    renderComposicao(list);
+    syncMetaForm();
+    renderPassos(hojeDia);
+    renderStore();
+  }
+
+  var hoje0 = iso(hojeDia);
+  el("f-data").value = hoje0;
+  el("ex-data").value = hoje0;
+
+  // Medições
+  el("form-reg").addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var dataStr = el("f-data").value;
+    var peso = parseNum(el("f-peso").value);
+    if (!dataStr) { setMsg("Informe a data da medição."); return; }
+    if (peso === null || peso < 40 || peso > 250) { setMsg("Informe o peso em kg, entre 40 e 250."); return; }
+    var item = {
+      data: dataStr,
+      hora: "",
+      peso: peso,
+      gordura_pct: parseNum(el("f-gord").value),
+      musculo_esq_kg: parseNum(el("f-musc").value),
+      agua_pct: parseNum(el("f-agua").value),
+      visceral: parseNum(el("f-visc").value),
+      metab_kcal: parseNum(el("f-metab").value)
+    };
+    Object.keys(item).forEach(function (k) { if (item[k] === null) { delete item[k]; } });
+    var id = dataStr + "_" + Date.now();
+    gravar("medicoes/" + id, item, function () { var c = {}; for (var k in item) { c[k] = item[k]; } c._id = id; stored.push(c); })
+      .then(function (ok) {
+        ["f-peso", "f-gord", "f-musc", "f-agua", "f-visc", "f-metab"].forEach(function (i) { el(i).value = ""; });
+        setMsg(ok ? "Medição registrada." : "Medição mostrada nesta tela, sem salvar.");
+      }).catch(function () { setMsg(ERRO_SALVAR); });
+  });
+
+  el("btn-remove").addEventListener("click", function () {
+    if (!stored.length) { setMsg("Não há medições registradas para remover."); return; }
+    var ultimo = stored.slice().sort(function (a, b) { return a._id < b._id ? -1 : 1; }).pop();
+    apagar("medicoes/" + ultimo._id, function () { stored = stored.filter(function (x) { return x._id !== ultimo._id; }); })
+      .then(function () { setMsg("Última medição removida."); })
+      .catch(function () { setMsg(ERRO_SALVAR); });
+  });
+
+  // Aplicações
+  function aoClicarAplic(ev) {
+    var b = ev.target.closest ? ev.target.closest("button[data-iso]") : null;
+    if (!b) { return; }
+    prefillAp(b.getAttribute("data-iso"));
+    el("form-ap").scrollIntoView({ block: "center" });
+  }
+  el("ap-body").addEventListener("click", aoClicarAplic);
+  el("aviso").addEventListener("click", aoClicarAplic);
+  el("ap-sem").addEventListener("change", function () { prefillAp(el("ap-sem").value); });
+
+  el("form-ap").addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var k = el("ap-sem").value;
+    var data = el("ap-data").value;
+    var dose = Number(el("ap-dose").value);
+    var a = agenda().filter(function (x) { return x.iso === k; })[0];
+    if (!a || !data) { msgId("ap-msg", "Escolha a semana e informe a data em que aplicou."); return; }
+    var obj = { sched: k, data: data, dose_mg: dose, local: el("ap-local").value, obs: el("ap-obs").value.trim().slice(0, 200) };
+    var aviso = dose > a.mg ? " Dose acima da prevista no esquema (" + mgTxt(a.mg) + " mg): confirme com o médico." : "";
+    gravar("aplicacoes/" + k, obj, function () { var c = {}; for (var i in obj) { c[i] = obj[i]; } c._id = k; aplic[k] = c; })
+      .then(function (ok) {
+        msgId("ap-msg", (ok ? "Aplicação confirmada." : "Aplicação mostrada nesta tela, sem salvar.") + aviso);
+        el("ap-undo").disabled = false;
+        el("ap-form-t").textContent = "Editar aplicação confirmada";
+      }).catch(function () { msgId("ap-msg", ERRO_SALVAR); });
+  });
+
+  el("ap-undo").addEventListener("click", function () {
+    var k = el("ap-sem").value;
+    if (!aplic[k]) { msgId("ap-msg", "Esta semana não tem confirmação para desfazer."); return; }
+    apagar("aplicacoes/" + k, function () { delete aplic[k]; })
+      .then(function () {
+        msgId("ap-msg", "Confirmação desfeita.");
+        el("ap-undo").disabled = true;
+        el("ap-form-t").textContent = "Confirmar aplicação";
+      }).catch(function () { msgId("ap-msg", ERRO_SALVAR); });
+  });
+
+  // Exercícios
+  el("form-ex").addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var data = el("ex-data").value;
+    var dist = parseNum(el("ex-dist").value);
+    var tempo = parseTempo(el("ex-tempo").value);
+    var cal = parseNum(el("ex-cal").value);
+    if (!data) { msgId("ex-msg", "Informe a data do exercício."); return; }
+    if (dist === null && tempo === null) { msgId("ex-msg", "Informe a distância ou o tempo."); return; }
+    if ((dist !== null && (dist < 0 || dist > 200)) || (tempo !== null && (tempo <= 0 || tempo > 1440)) || (cal !== null && (cal < 0 || cal > 10000))) {
+      msgId("ex-msg", "Confira os valores: distância até 200 km, tempo até 24 h e calorias até 10000.");
+      return;
+    }
+    var item = { data: data, tipo: el("ex-tipo").value, distancia_km: dist, tempo_min: tempo, calorias: cal };
+    Object.keys(item).forEach(function (k) { if (item[k] === null) { delete item[k]; } });
+    var id = data + "_" + Date.now();
+    gravar("exercicios/" + id, item, function () { var c = {}; for (var k in item) { c[k] = item[k]; } c._id = id; exerc.push(c); })
+      .then(function (ok) {
+        ["ex-dist", "ex-tempo", "ex-cal"].forEach(function (i) { el(i).value = ""; });
+        msgId("ex-msg", ok ? "Exercício registrado." : "Exercício mostrado nesta tela, sem salvar.");
+      }).catch(function () { msgId("ex-msg", ERRO_SALVAR); });
+  });
+
+  el("ex-body").addEventListener("click", function (ev) {
+    var b = ev.target.closest ? ev.target.closest("button[data-id]") : null;
+    if (!b) { return; }
+    var id = b.getAttribute("data-id");
+    apagar("exercicios/" + id, function () { exerc = exerc.filter(function (x) { return x._id !== id; }); })
+      .then(function () { msgId("ex-msg", "Exercício removido."); })
+      .catch(function () { msgId("ex-msg", ERRO_SALVAR); });
+  });
+
+  // Meta
+  function salvarMeta(meta, fim) {
+    return gravar("config/meta", { meta: meta, fim: fim }, function () { cfg = { meta: meta, fim: fim }; syncMeta = true; })
+      .then(function (ok) {
+        syncMeta = true;
+        render();
+        msgId("m-msg", ok ? "Meta salva." : "Meta aplicada nesta tela, sem salvar.");
+      }).catch(function () { msgId("m-msg", ERRO_SALVAR); });
+  }
+  el("form-meta").addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var peso = parseNum(el("m-peso").value);
+    var fim = el("m-data").value;
+    if (peso === null || peso < 45 || peso >= PESO_INI) { msgId("m-msg", "Informe uma meta de peso entre 45 e " + fmt(PESO_INI - 0.1, 1) + " kg."); return; }
+    if (!okISO(fim)) { msgId("m-msg", "Informe a data da meta."); return; }
+    var dias = Math.round((parseISO(fim) - START) / DAY_MS);
+    if (dias < 14 || dias > 700) { msgId("m-msg", "A data da meta deve ficar entre 14 e 700 dias após 19/10/2026."); return; }
+    salvarMeta(Math.round(peso * 10) / 10, fim);
+  });
+  el("m-reset").addEventListener("click", function () { salvarMeta(DATA.projeto.meta, DATA.projeto.fim); });
+
+  function dataHoraBR(d) { return fmtData(d) + " " + pad2(d.getHours()) + ":" + pad2(d.getMinutes()); }
+  var abertos = [];
+  window.addEventListener("beforeprint", function () {
+    el("print-date").textContent = dataHoraBR(new Date());
+    abertos = [];
+    Array.prototype.forEach.call(document.querySelectorAll("details"), function (d) { abertos.push([d, d.open]); d.open = true; });
+  });
+  window.addEventListener("afterprint", function () { abertos.forEach(function (p) { p[0].open = p[1]; }); });
+  el("btn-pdf").addEventListener("click", function () { window.print(); });
+  el("bk-exp").addEventListener("click", function () { window.SAUDE_EXPORTAR(); el("bk-msg").textContent = "Backup exportado. Procure o arquivo na pasta de downloads."; });
+  el("bk-imp").addEventListener("click", function () { el("bk-file").click(); });
+  el("bk-file").addEventListener("change", function () {
+    var f = el("bk-file").files[0];
+    if (!f) { return; }
+    window.SAUDE_IMPORTAR(f, function (ok, msg) { el("bk-msg").textContent = msg; el("bk-file").value = ""; });
+  });
+
+  render();
+  startDb();
+})();
+</script>
+
+<script>
+if ("serviceWorker" in navigator) { window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); }); }
+</script>
+</body>
+</html>
